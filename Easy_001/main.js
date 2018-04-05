@@ -29,65 +29,65 @@ var nameString = "";
 var ageString = "";
 var userString = "";
 var saveExists = false;
-var saveLoaded = false;
+var disabled = false;
+var nameTextBox = document.getElementById("TEXTBOX_NAME").valueOf();
+var ageTextBox = document.getElementById("TEXTBOX_AGE");
+var userTextBox = document.getElementById("TEXTBOX_USER");
+var responseArea = document.getElementById("P_RESPONSE");
+var submitButton = document.getElementById("BUTTON_SUBMIT");
 
 //Sort functions here.
-function askName(){
-    nameString = prompt("What is your name?");
-}
-function askAge(){
-    ageString = prompt("How old are you?");
-}
-function askUser(){
-    userString = prompt("What is your reddit username?");
-}
-function response(){
-    alert("Your name is " + nameString + ", you are " + ageString + " years old, and your username is " + userString + ".");
-}
 function saveInput(){
-    if(confirm("Would you like to save your content for future use?\n" + // Make sure user wants to save.
-        "ALERT: Doing so will overwrite any existing content!")){
-        if (typeof(Storage) !== "undefined"){  //if browser is compatible with WebStorage
-            localStorage.setItem("Name", nameString);
-            localStorage.setItem("Age", ageString);
-            localStorage.setItem("Username", userString);
-        }
-        else { //browser incompatible with WebStorage
-            alert("Please keep in mind that, because your browser does not support WebStorage, your content could not" +
-                "be saved for future use.");
-        }
-    }
-    else{
-        alert("You chose not to save your content for future use.  Content previously saved should remain intact.")
+    if (typeof(Storage) !== "undefined"){  //if browser is compatible with WebStorage
+        localStorage.setItem("Name", nameString);
+        localStorage.setItem("Age", ageString);
+        localStorage.setItem("Username", userString);
     }
 }
 function checkForSave(){
-    if (localStorage.getItem("Name") === null){
-        alert("First use detected.  Welcome!");
-    }
-    else {
+    if (localStorage.getItem("Name") !== null) {
         saveExists = true;
-        alert("Saved content detected.");
     }
 }
 function loadSavedContent(){
     if (saveExists){
-        if (confirm("Would you like to use your previously saved content for this session?")){
-            nameString = localStorage.getItem("Name");
-            ageString = localStorage.getItem("Age");
-            userString = localStorage.getItem("Username");
-            saveLoaded = true;
-        }
+        nameTextBox.value = localStorage.getItem("Name");
+        ageTextBox.value = localStorage.getItem("Age");
+        userTextBox.value = localStorage.getItem("Username");
+    }
+}
+function response(){
+    responseArea.innerHTML = "Your name is " +
+        nameString + ", your age is " +
+        ageString + ", and your reddit username is " +
+        userString + ".";
+}
+function submit(){
+    nameString = nameTextBox.value;
+    ageString = ageTextBox.value;
+    userString = userTextBox.value;
+    saveInput();
+    response();
+}
+function buttonLogic(){
+    if (nameTextBox.value !== null &&
+        ageTextBox.value !== null &&
+        userTextBox.value !== null &&
+        nameTextBox.value !== "" &&
+        ageTextBox.value !== "" &&
+        userTextBox.value !== "" &&
+        isNaN(parseInt(nameTextBox.value)) &&
+        !isNaN(parseInt(ageTextBox.value))){
+        submitButton.disabled = false;
+    }
+    else {
+        submitButton.disabled = true;
     }
 }
 
 //Sort instructions here.
-checkForSave();
-loadSavedContent();
-if (!saveLoaded){
-    askName();
-    askAge();
-    askUser();
-    saveInput();
+if (!disabled){
+    checkForSave();
+    loadSavedContent();
+    buttonLogic();
 }
-response();
